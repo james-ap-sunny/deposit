@@ -51,15 +51,11 @@ class Config:
     DB_POOL_TIMEOUT = int(os.environ.get('DB_POOL_TIMEOUT') or 30)
     DB_POOL_RECYCLE = int(os.environ.get('DB_POOL_RECYCLE') or 3600)
     
-    @property
-    def SOURCE_DATABASE_URI(self):
-        """Source database connection URI"""
-        return f"mysql+pymysql://{self.DB1_USER}:{self.DB1_PASSWORD}@{self.DB1_HOST}:{self.DB1_PORT}/{self.DB1_NAME}?charset=utf8mb4"
-    
-    @property
-    def DEST_DATABASE_URI(self):
-        """Destination database connection URI"""
-        return f"mysql+pymysql://{self.DB2_USER}:{self.DB2_PASSWORD}@{self.DB2_HOST}:{self.DB2_PORT}/{self.DB2_NAME}?charset=utf8mb4"
+    # Database connection URIs as regular attributes instead of properties
+    def __init__(self):
+        """Initialize configuration with database URIs"""
+        self.SOURCE_DATABASE_URI = f"mysql+pymysql://{self.DB1_USER}:{self.DB1_PASSWORD}@{self.DB1_HOST}:{self.DB1_PORT}/{self.DB1_NAME}?charset=utf8mb4"
+        self.DEST_DATABASE_URI = f"mysql+pymysql://{self.DB2_USER}:{self.DB2_PASSWORD}@{self.DB2_HOST}:{self.DB2_PORT}/{self.DB2_NAME}?charset=utf8mb4"
 
 
 class DevelopmentConfig(Config):

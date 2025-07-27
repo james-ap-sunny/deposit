@@ -19,9 +19,6 @@ def create_app(config_class=Config):
     """Application factory pattern"""
     app = Flask(__name__)
     app.config.from_object(config_class)
-    
-    # Store the config object for accessing properties
-    app.config['CONFIG_OBJECT'] = config_class
 """
 Core Banking Transfer Transaction System
 Flask Application Factory
@@ -66,7 +63,7 @@ def create_app(config_class=Config):
     setup_logging(app)
     
     # Initialize extensions
-    CORS(app)
+    CORS(app, resources={r"/*": {"origins": "*"}})
     
     # JWT Configuration
     jwt = JWTManager(app)

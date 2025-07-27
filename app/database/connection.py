@@ -3,6 +3,7 @@ Database connection management for distributed banking system
 """
 
 import logging
+import os
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import QueuePool
@@ -23,12 +24,30 @@ def init_databases(app):
     global source_engine, dest_engine, SourceSession, DestSession
     
     try:
-        # Get the config object to access properties
-        config_obj = app.config.get('CONFIG_OBJECT')
+        # Get database connection strings directly from environment variables if not in app.config
+        source_db_uri = app.config.get('SOURCE_DATABASE_URI')
+        dest_db_uri = app.config.get('DEST_DATABASE_URI')
+        
+        # If URIs are not available in app.config, build them from environment variables
+        if not source_db_uri:
+            db1_user = app.config.get('DB1_USER', os.environ.get('DB1_USER', 'bank_user'))
+            db1_password = app.config.get('DB1_PASSWORD', os.environ.get('DB1_PASSWORD', 'secure_password123'))
+            db1_host = app.config.get('DB1_HOST', os.environ.get('DB1_HOST', 'bank-db1'))
+            db1_port = app.config.get('DB1_PORT', os.environ.get('DB1_PORT', '3306'))
+            db1_name = app.config.get('DB1_NAME', os.environ.get('DB1_NAME', 'bank_source'))
+            source_db_uri = f"mysql+pymysql://{db1_user}:{db1_password}@{db1_host}:{db1_port}/{db1_name}?charset=utf8mb4"
+        
+        if not dest_db_uri:
+            db2_user = app.config.get('DB2_USER', os.environ.get('DB2_USER', 'bank_user'))
+            db2_password = app.config.get('DB2_PASSWORD', os.environ.get('DB2_PASSWORD', 'secure_password123'))
+            db2_host = app.config.get('DB2_HOST', os.environ.get('DB2_HOST', 'bank-db2'))
+            db2_port = app.config.get('DB2_PORT', os.environ.get('DB2_PORT', '3306'))
+            db2_name = app.config.get('DB2_NAME', os.environ.get('DB2_NAME', 'bank_dest'))
+            dest_db_uri = f"mysql+pymysql://{db2_user}:{db2_password}@{db2_host}:{db2_port}/{db2_name}?charset=utf8mb4"
         
         # Source database engine
         source_engine = create_engine(
-            config_obj.SOURCE_DATABASE_URI if config_obj else app.config['SOURCE_DATABASE_URI'],
+            source_db_uri,
             poolclass=QueuePool,
             pool_size=app.config['DB_POOL_SIZE'],
             pool_timeout=app.config['DB_POOL_TIMEOUT'],
@@ -39,7 +58,7 @@ def init_databases(app):
         
         # Destination database engine
         dest_engine = create_engine(
-            config_obj.DEST_DATABASE_URI if config_obj else app.config['DEST_DATABASE_URI'],
+            dest_db_uri,
             poolclass=QueuePool,
             pool_size=app.config['DB_POOL_SIZE'],
             pool_timeout=app.config['DB_POOL_TIMEOUT'],
