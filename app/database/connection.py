@@ -23,9 +23,12 @@ def init_databases(app):
     global source_engine, dest_engine, SourceSession, DestSession
     
     try:
+        # Get the config object to access properties
+        config_obj = app.config.get('CONFIG_OBJECT')
+        
         # Source database engine
         source_engine = create_engine(
-            app.config['SOURCE_DATABASE_URI'],
+            config_obj.SOURCE_DATABASE_URI if config_obj else app.config['SOURCE_DATABASE_URI'],
             poolclass=QueuePool,
             pool_size=app.config['DB_POOL_SIZE'],
             pool_timeout=app.config['DB_POOL_TIMEOUT'],
@@ -36,7 +39,7 @@ def init_databases(app):
         
         # Destination database engine
         dest_engine = create_engine(
-            app.config['DEST_DATABASE_URI'],
+            config_obj.DEST_DATABASE_URI if config_obj else app.config['DEST_DATABASE_URI'],
             poolclass=QueuePool,
             pool_size=app.config['DB_POOL_SIZE'],
             pool_timeout=app.config['DB_POOL_TIMEOUT'],

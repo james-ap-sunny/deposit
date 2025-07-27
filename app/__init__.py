@@ -20,6 +20,48 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
     
+    # Store the config object for accessing properties
+    app.config['CONFIG_OBJECT'] = config_class
+"""
+Core Banking Transfer Transaction System
+Flask Application Factory
+"""
+
+from flask import Flask
+from flask_cors import CORS
+from flask_jwt_extended import JWTManager
+import logging
+import os
+from datetime import timedelta
+
+from app.config.settings import Config
+from app.database.connection import init_databases
+from app.utils.logger import setup_logging
+
+
+def create_app(config_class=Config):
+"""
+Core Banking Transfer Transaction System
+Flask Application Factory
+"""
+
+from flask import Flask
+from flask_cors import CORS
+from flask_jwt_extended import JWTManager
+import logging
+import os
+from datetime import timedelta
+
+from app.config.settings import Config
+from app.database.connection import init_databases
+from app.utils.logger import setup_logging
+
+
+def create_app(config_class=Config):
+    """Application factory pattern"""
+    app = Flask(__name__)
+    app.config.from_object(config_class)
+    
     # Setup logging
     setup_logging(app)
     
